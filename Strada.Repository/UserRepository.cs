@@ -13,7 +13,12 @@ namespace Strada.Repository
             _context = context;
         }
 
-        public async Task<bool> EmailExistsAsync(string email, int id = 0)
+        public async Task<bool> EmailExistsAsync(string email)
+        {
+            return await _context.Users.AnyAsync(u => u.Email != null && u.Email.ToLower() == email.ToLower());
+        }
+
+        public async Task<bool> EmailExistsAsync(string email, int id)
         {
             return await _context.Users.AnyAsync(u => u.Email != null && u.Email.ToLower() == email.ToLower() && u.Id != id);
         }

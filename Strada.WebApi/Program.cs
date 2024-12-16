@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Strada.Repository;
 using Strada.Repository.Interface;
+using Strada.Service;
+using Strada.Service.Interface;
+using Strada.Service.Mapper;
 
 namespace Strada.WebApi
 {
@@ -12,7 +15,14 @@ namespace Strada.WebApi
 
             builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("TestDb"));
 
+            builder.Services.AddAutoMapper(typeof(UserProfile));
+            builder.Services.AddAutoMapper(typeof(EmploymentProfile));
+
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IEmploymentService, EmploymentService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -20,6 +30,12 @@ namespace Strada.WebApi
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                dbContext.Database.EnsureCreated();
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

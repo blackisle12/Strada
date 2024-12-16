@@ -10,5 +10,6 @@ namespace Strada.Repository.Interface
         void Update(T entity);
         Task DeleteAsync(int id);
         Task SaveChangesAsync();
+        void Detach(T entity);
     }
 }
